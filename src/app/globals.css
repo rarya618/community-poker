@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+:root {
+  --felt: #1a5c38;
+  --felt-dark: #0d3d25;
+  --chip-gold: #d4a017;
+}
+
+body {
+  background: var(--felt-dark);
+  color: #f0f0f0;
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}

@@ -1,0 +1,38 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "rooms": {
+      "$roomId": {
+        ".read": "auth != null",
+        ".write": false,
+        "game": {
+          ".write": false
+        },
+        "players": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
+      }
+    },
+    "private": {
+      "$roomId": {
+        "$uid": {
+          "holeCards": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": false
+          },
+          "deck": {
+            ".read": false,
+            ".write": false
+          }
+        }
+      }
+    }
+  }
+}

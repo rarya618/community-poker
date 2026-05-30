@@ -1,8 +1,8 @@
 "use client";
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { ref, set } from "firebase/database";
+import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { useRoom, useHoleCards } from "@/hooks/useRoom";
 import { apiCall } from "@/hooks/useApiCall";
@@ -14,6 +14,12 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const { roomId } = use(params);
   const { user } = useAuth();
   const router = useRouter();
+
+  async function leaveRoom() {
+    const uid = user?.uid;
+    if (uid) await set(ref(db, `rooms/${roomId}/players/${uid}/isConnected`), false);
+    router.replace("/lobby");
+  }
   const { room, loading } = useRoom(roomId);
   const holeCards = useHoleCards(roomId, user?.uid ?? null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -87,7 +93,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         </div>
         <div className="flex items-center gap-3">
           {error && <span className="text-xs text-red-400">{error}</span>}
-          <Button variant="ghost" size="sm" onClick={() => signOut(auth).then(() => router.replace("/login"))}>
+          <Button variant="ghost" size="sm" onClick={leaveRoom}>
             Leave
           </Button>
         </div>

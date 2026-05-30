@@ -34,6 +34,7 @@ export function PlayerSeat({
       className={cn(
         "flex flex-col items-center gap-1.5",
         folded && "opacity-40",
+        !folded && player.isConnected === false && "opacity-50 grayscale",
         isActive && "drop-shadow-[0_0_12px_rgba(74,222,128,0.8)]",
       )}
     >
@@ -52,12 +53,19 @@ export function PlayerSeat({
           "flex flex-col items-center rounded-xl px-3 py-2 min-w-[90px] border transition-colors",
           isCurrentUser
             ? "bg-green-900/60 border-green-600"
+            : player.isConnected === false
+            ? "bg-zinc-900/60 border-red-900/60"
             : "bg-zinc-900/80 border-white/10",
           isActive && "border-green-400",
         )}
       >
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-semibold text-white truncate max-w-[80px]">{player.name}</span>
+          {player.isConnected === false && (
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" title="Disconnected" />
+          )}
+          <span className={cn("text-xs font-semibold truncate max-w-[80px]", player.isConnected === false ? "text-zinc-500" : "text-white")}>
+            {player.name}
+          </span>
           {isDealer && <span className="text-[10px] bg-white text-black rounded-full px-1 font-bold">D</span>}
           {isSmallBlind && <span className="text-[10px] bg-blue-500 text-white rounded-full px-1 font-bold">SB</span>}
           {isBigBlind && <span className="text-[10px] bg-purple-500 text-white rounded-full px-1 font-bold">BB</span>}

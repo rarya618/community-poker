@@ -109,7 +109,7 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
           </div>
           <div className="flex items-center gap-3">
             {error && <span className="text-xs text-red-400/80">{error}</span>}
-            <button onClick={onLeave} className="text-[10px] text-zinc-600 hover:text-zinc-300 transition-colors">Leave</button>
+            <button onClick={onLeave} className="px-3 py-1.5 text-xs font-medium rounded border border-white/10 text-zinc-300 hover:border-white/25 hover:text-white transition-colors">Leave</button>
           </div>
         </div>
 

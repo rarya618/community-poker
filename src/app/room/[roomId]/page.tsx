@@ -95,7 +95,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         <div className="flex flex-1 flex-col items-center justify-center gap-12 p-8">
           <div className="absolute top-0 right-0 flex items-center gap-4 px-6 py-4">
             {error && <span className="text-xs text-red-400/80">{error}</span>}
-            <button onClick={leaveRoom} className="text-[10px] text-zinc-600 hover:text-zinc-300 transition-colors">Leave</button>
+            <button onClick={leaveRoom} className="px-4 py-2 text-sm font-medium rounded border border-white/10 text-zinc-300 hover:border-white/25 hover:text-white transition-colors">Leave</button>
           </div>
           <div className="flex flex-col items-center gap-3">
             <span className="text-[10px] text-zinc-700">Room Code</span>
@@ -124,7 +124,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
             <button
               onClick={startGame}
               disabled={actionLoading || playerCount < 2}
-              className="text-xs text-zinc-400 hover:text-white border-b border-zinc-700 hover:border-zinc-400 pb-px transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+              className="w-full max-w-xs py-3 text-sm font-medium rounded border border-white/10 text-zinc-300 hover:border-white/25 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               {actionLoading ? "Starting…" : playerCount < 2 ? "Need 2+ players" : "Start Game"}
             </button>

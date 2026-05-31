@@ -64,17 +64,22 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-neutral-950">
+        <div className="w-5 h-5 border border-white/20 border-t-white/60 rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!room) {
     return (
-      <div className="flex min-h-screen items-center justify-center flex-col gap-4">
-        <p className="text-zinc-300">Room not found.</p>
-        <Button onClick={() => router.replace("/lobby")}>Back to Lobby</Button>
+      <div className="flex min-h-screen items-center justify-center flex-col gap-6 bg-neutral-950">
+        <p className="text-xs text-zinc-600">Room not found</p>
+        <button
+          onClick={() => router.replace("/lobby")}
+          className="text-xs text-zinc-500 hover:text-white border-b border-zinc-700 hover:border-zinc-400 pb-px transition-colors"
+        >
+          Back to Lobby
+        </button>
       </div>
     );
   }
@@ -85,62 +90,72 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const variantLabel = room.variant === "holdem" ? "Texas Hold'em" : "Omaha";
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/20">
-        <div className="flex items-center gap-3">
-          <span className="font-bold text-white">Room <span className="font-mono text-green-400">{roomId}</span></span>
-          <span className="text-xs text-zinc-400 border border-white/20 rounded px-2 py-0.5">{variantLabel}</span>
+    <div className="flex flex-col min-h-screen bg-neutral-950">
+      <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+        <div className="flex items-center gap-4">
+          <span className="font-mono text-white text-sm">{roomId}</span>
+          <span className="text-[10px] text-zinc-600">{variantLabel}</span>
         </div>
-        <div className="flex items-center gap-3">
-          {error && <span className="text-xs text-red-400">{error}</span>}
-          <Button variant="ghost" size="sm" onClick={leaveRoom}>
+        <div className="flex items-center gap-4">
+          {error && <span className="text-xs text-red-400/80">{error}</span>}
+          <button
+            onClick={leaveRoom}
+            className="text-[10px] text-zinc-600 hover:text-zinc-300 transition-colors"
+          >
             Leave
-          </Button>
+          </button>
         </div>
       </header>
 
       {room.status === "waiting" ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-6 p-6">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-white mb-1">Waiting for players</h2>
-            <p className="text-zinc-400 text-sm">Share the room code with friends</p>
+        <div className="flex flex-1 flex-col items-center justify-center gap-12 p-8">
+          <div className="flex flex-col items-center gap-3">
+            <span className="text-[10px] text-zinc-700">Room Code</span>
+            <span className="text-6xl font-mono font-thin text-white tracking-[0.25em]">{roomId}</span>
           </div>
-          <div className="text-6xl font-mono font-bold text-green-400 tracking-widest border-2 border-green-700 rounded-2xl px-8 py-4 bg-black/30">
-            {roomId}
-          </div>
-          <div className="rounded-xl bg-white/5 border border-white/10 p-4 w-full max-w-sm">
-            <h3 className="text-sm font-semibold text-zinc-400 mb-3">Players ({playerCount}/9)</h3>
-            <div className="flex flex-col gap-2">
-              {Object.values(room.players).map(p => (
-                <div key={p.uid} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
-                    <span className="text-sm text-white">{p.name}</span>
-                    {p.uid === room.hostUid && <span className="text-[10px] text-yellow-400 font-bold">HOST</span>}
-                  </div>
-                  <span className="text-xs text-zinc-400 font-mono">{room.startingChips.toLocaleString()} chips</span>
-                </div>
-              ))}
+
+          <div className="flex flex-col gap-0 w-full max-w-xs">
+            <div className="flex items-center justify-between py-2 border-b border-white/[0.06]">
+              <span className="text-[10px] text-zinc-700">Players</span>
+              <span className="text-[10px] font-mono text-zinc-700">{playerCount}/9</span>
             </div>
+            {Object.values(room.players).map(p => (
+              <div key={p.uid} className="flex items-center justify-between py-2.5 border-b border-white/[0.04]">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-white">{p.name}</span>
+                  {p.uid === room.hostUid && (
+                    <span className="text-[9px] text-zinc-700">host</span>
+                  )}
+                </div>
+                <span className="text-xs font-mono text-zinc-600">{room.startingChips.toLocaleString()}</span>
+              </div>
+            ))}
           </div>
-          {isHost && (
-            <Button
-              size="lg"
+
+          {isHost ? (
+            <button
               onClick={startGame}
               disabled={actionLoading || playerCount < 2}
+              className="text-xs text-zinc-400 hover:text-white border-b border-zinc-700 hover:border-zinc-400 pb-px transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
             >
               {actionLoading ? "Starting…" : playerCount < 2 ? "Need 2+ players" : "Start Game"}
-            </Button>
+            </button>
+          ) : (
+            <p className="text-[10px] text-zinc-700">Waiting for host…</p>
           )}
-          {!isHost && <p className="text-zinc-400 text-sm">Waiting for host to start the game…</p>}
         </div>
       ) : room.status === "finished" ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4">
-          <h2 className="text-2xl font-bold text-white">Game Over</h2>
-          <Button onClick={() => router.replace("/lobby")}>Back to Lobby</Button>
+        <div className="flex flex-1 flex-col items-center justify-center gap-6 bg-neutral-950">
+          <p className="text-xs text-zinc-600">Game Over</p>
+          <button
+            onClick={() => router.replace("/lobby")}
+            className="text-xs text-zinc-500 hover:text-white border-b border-zinc-700 hover:border-zinc-400 pb-px transition-colors"
+          >
+            Back to Lobby
+          </button>
         </div>
       ) : room.game ? (
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1">
           <Table
             room={room}
             game={room.game}

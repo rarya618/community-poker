@@ -39,52 +39,59 @@ export function ActionPanel({ game, currentPlayer, minBet, onAction, loading }: 
   const canRaise = !!raiseAmount && raiseValue >= minRaise && raiseValue <= maxRaise;
 
   return (
-    <div className="flex flex-col gap-3 w-full max-w-lg mx-auto">
-      {/* Primary actions */}
-      <div className="flex gap-2 justify-center">
-        <Button variant="danger" onClick={() => onAction("fold")} disabled={loading} size="lg">
+    <div className="flex flex-col gap-4 w-full max-w-lg mx-auto">
+      <div className="flex items-center justify-center gap-10">
+        <button
+          onClick={() => onAction("fold")}
+          disabled={loading}
+          className="text-xs text-red-400/70 hover:text-red-300 disabled:opacity-30 transition-colors"
+        >
           Fold
-        </Button>
+        </button>
         {canCheck ? (
-          <Button variant="secondary" onClick={() => onAction("check")} disabled={loading} size="lg">
+          <button
+            onClick={() => onAction("check")}
+            disabled={loading}
+            className="text-xs text-white hover:text-zinc-300 disabled:opacity-30 transition-colors"
+          >
             Check
-          </Button>
+          </button>
         ) : (
-          <Button variant="secondary" onClick={() => onAction("call")} disabled={loading} size="lg">
-            Call {callAmount.toLocaleString()}
-          </Button>
+          <button
+            onClick={() => onAction("call")}
+            disabled={loading}
+            className="text-xs text-white hover:text-zinc-300 disabled:opacity-30 transition-colors"
+          >
+            Call <span className="font-mono">{callAmount.toLocaleString()}</span>
+          </button>
         )}
-        <Button
+        <button
           onClick={() => onAction("all-in")}
           disabled={loading}
-          size="lg"
-          className="bg-orange-700 hover:bg-orange-600 text-white px-6 py-3 text-base rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-xs text-zinc-400 hover:text-white disabled:opacity-30 transition-colors"
         >
           All In
-        </Button>
+        </button>
       </div>
 
-      {/* Raise presets */}
-      <div className="flex gap-1.5 justify-center flex-wrap">
+      <div className="flex gap-3 justify-center flex-wrap">
         {presets.map(p => (
           <button
             key={p.label}
             onClick={() => setPreset(p.value)}
             disabled={loading || p.value >= maxRaise}
-            className={`rounded-md border px-3 py-1 text-xs font-semibold transition
+            className={`text-[10px] transition-colors disabled:opacity-20 disabled:cursor-not-allowed
               ${raiseValue === p.value
-                ? "border-green-500 bg-green-700/40 text-green-300"
-                : "border-white/20 text-zinc-400 hover:border-white/40 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                ? "text-white"
+                : "text-zinc-600 hover:text-zinc-400"
               }`}
           >
-            {p.label}
-            <span className="ml-1 text-zinc-500 font-normal">{p.value.toLocaleString()}</span>
+            {p.label} <span className="font-mono">{p.value.toLocaleString()}</span>
           </button>
         ))}
       </div>
 
-      {/* Custom raise input + submit */}
-      <div className="flex items-center gap-2 justify-center">
+      <div className="flex items-center gap-3 justify-center">
         <input
           type="number"
           min={minRaise}
@@ -92,16 +99,16 @@ export function ActionPanel({ game, currentPlayer, minBet, onAction, loading }: 
           step={minBet}
           value={raiseAmount}
           onChange={e => setRaiseAmount(e.target.value)}
-          placeholder={`min ${minRaise.toLocaleString()}`}
-          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white placeholder:text-zinc-500 w-36 text-sm focus:outline-none focus:border-green-500"
+          placeholder={`${minRaise.toLocaleString()}`}
+          className="bg-transparent border-b border-white/10 focus:border-white/30 px-1 py-1 text-white placeholder:text-zinc-700 w-28 text-xs font-mono focus:outline-none transition-colors text-center"
         />
-        <Button
-          variant="primary"
+        <button
           onClick={() => { onAction("raise", raiseValue); setRaiseAmount(""); }}
           disabled={loading || !canRaise}
+          className="text-xs text-zinc-400 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors border-b border-zinc-700 hover:border-zinc-400 pb-px"
         >
-          Raise {canRaise ? raiseValue.toLocaleString() : ""}
-        </Button>
+          Raise{canRaise ? <span className="font-mono ml-1">{raiseValue.toLocaleString()}</span> : null}
+        </button>
       </div>
     </div>
   );

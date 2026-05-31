@@ -50,41 +50,32 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
   const isShowdown = game.street === "showdown";
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Table area */}
+    <div className="flex flex-col h-full bg-neutral-950">
       <div className="relative flex-1 min-h-[420px]">
-        {/* Felt */}
-        <div
-          className="absolute inset-8 rounded-[50%] border-4 border-[#0a3020]"
-          style={{ background: "radial-gradient(ellipse at center, #1e6b3e 0%, #155230 60%, #0f3d25 100%)" }}
-        />
+        <div className="absolute inset-8 rounded-[50%] bg-neutral-900/40 border border-white/[0.04]" />
 
-        {/* Community cards + pot */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
           <div className="flex gap-1.5">
             {communityCards.map((card, i) => (
               <PlayingCard key={i} card={card} size="md" />
             ))}
             {Array.from({ length: 5 - communityCards.length }).map((_, i) => (
-              <div key={i} className="w-14 h-20 rounded-lg border border-white/10 border-dashed opacity-30" />
+              <div key={i} className="w-14 h-20 rounded opacity-[0.06] bg-white/10" />
             ))}
           </div>
           {totalPot > 0 && (
-            <div className="flex flex-col items-center gap-1">
-              <div className="rounded-full bg-black/50 border border-yellow-600/50 px-4 py-1 text-sm font-bold text-yellow-400">
-                Pot: {totalPot.toLocaleString()}
-              </div>
+            <div className="flex flex-col items-center gap-0.5 mt-1">
+              <span className="text-sm font-mono text-white">{totalPot.toLocaleString()}</span>
               {hasMultiplePots && contestedPots.map((p, i) => (
-                <div key={i} className="text-[10px] text-zinc-400">
-                  {i === 0 ? "Main" : `Side ${i}`}: {p.amount.toLocaleString()}
-                </div>
+                <span key={i} className="text-[10px] font-mono text-zinc-700">
+                  {i === 0 ? "main" : `side ${i}`} {p.amount.toLocaleString()}
+                </span>
               ))}
             </div>
           )}
-          <div className="text-xs text-zinc-400 capitalize font-medium">{game.street}</div>
+          <span className="text-[10px] text-zinc-700 mt-0.5">{game.street}</span>
         </div>
 
-        {/* Players at seats */}
         {players.map((player, idx) => {
           const pos = SEAT_POSITIONS[idx] ?? { top: "50%", left: "50%" };
           return (
@@ -109,27 +100,29 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
         })}
       </div>
 
-      {/* Bottom panel */}
-      <div className="border-t border-white/10 bg-black/30 px-6 py-4 min-h-[120px] flex items-center justify-center">
+      <div className="sticky bottom-0 border-t border-white/[0.06] bg-neutral-950 px-6 py-5 min-h-[110px] flex items-center justify-center">
         {isShowdown ? (
           <div className="flex flex-col items-center gap-3 text-center">
             {game.winners?.map(w => (
-              <div key={w.uid} className="text-green-400 font-semibold">
-                {room.players[w.uid]?.name ?? w.uid} wins {w.amount.toLocaleString()} chips
-                {w.handDescription !== "Last player standing" && ` — ${w.handDescription}`}
+              <div key={w.uid} className="text-sm text-white">
+                <span className="font-medium">{room.players[w.uid]?.name ?? w.uid}</span>
+                <span className="font-mono text-zinc-400 ml-2">+{w.amount.toLocaleString()}</span>
+                {w.handDescription !== "Last player standing" && (
+                  <span className="text-zinc-600 text-xs ml-2">— {w.handDescription}</span>
+                )}
               </div>
             ))}
             {room.hostUid === currentUid && (
               <button
                 onClick={onNextHand}
                 disabled={actionLoading}
-                className="mt-2 rounded-lg bg-green-700 hover:bg-green-600 text-white font-semibold px-6 py-2.5 transition disabled:opacity-50"
+                className="mt-1 text-xs text-zinc-400 hover:text-white border-b border-zinc-700 hover:border-zinc-400 pb-px transition-colors disabled:opacity-30"
               >
                 {actionLoading ? "Starting…" : "Next Hand"}
               </button>
             )}
             {room.hostUid !== currentUid && (
-              <p className="text-zinc-400 text-sm">Waiting for host to start next hand…</p>
+              <p className="text-xs text-zinc-700">Waiting for host…</p>
             )}
           </div>
         ) : isMyTurn && currentPlayer ? (
@@ -141,9 +134,9 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
             loading={actionLoading}
           />
         ) : (
-          <p className="text-zinc-400 text-sm">
+          <p className="text-xs text-zinc-700">
             {game.playerStates[currentUid]?.folded
-              ? "You folded. Waiting for the hand to end…"
+              ? "You folded"
               : `Waiting for ${room.players[game.activeUid]?.name ?? "other player"}…`}
           </p>
         )}

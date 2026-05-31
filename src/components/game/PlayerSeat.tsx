@@ -32,14 +32,12 @@ export function PlayerSeat({
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-1.5",
-        folded && "opacity-40",
-        !folded && player.isConnected === false && "opacity-50 grayscale",
-        isActive && "drop-shadow-[0_0_12px_rgba(74,222,128,0.8)]",
+        "flex flex-col items-center gap-1",
+        folded && "opacity-20",
+        !folded && player.isConnected === false && "opacity-35",
       )}
     >
-      {/* Hole cards */}
-      <div className="flex gap-1">
+      <div className="flex gap-0.5">
         {Array.from({ length: holeCardCount }).map((_, i) => (
           isCurrentUser && holeCards?.[i]
             ? <PlayingCard key={i} card={holeCards[i]} size="sm" />
@@ -47,33 +45,24 @@ export function PlayerSeat({
         ))}
       </div>
 
-      {/* Player info chip */}
-      <div
-        className={cn(
-          "flex flex-col items-center rounded-xl px-3 py-2 min-w-[90px] border transition-colors",
-          isCurrentUser
-            ? "bg-green-900/60 border-green-600"
-            : player.isConnected === false
-            ? "bg-zinc-900/60 border-red-900/60"
-            : "bg-zinc-900/80 border-white/10",
-          isActive && "border-green-400",
-        )}
-      >
-        <div className="flex items-center gap-1.5">
-          {player.isConnected === false && (
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" title="Disconnected" />
-          )}
-          <span className={cn("text-xs font-semibold truncate max-w-[80px]", player.isConnected === false ? "text-zinc-500" : "text-white")}>
+      <div className="flex flex-col items-center gap-0.5 mt-0.5">
+        <div className="flex items-center gap-1">
+          {isActive && <span className="w-1 h-1 rounded-full bg-white shrink-0" />}
+          <span className={cn(
+            "text-xs truncate max-w-[80px] tracking-wide",
+            isCurrentUser ? "text-white font-medium" : "text-zinc-300 font-normal",
+            player.isConnected === false && "text-zinc-600",
+          )}>
             {player.name}
           </span>
-          {isDealer && <span className="text-[10px] bg-white text-black rounded-full px-1 font-bold">D</span>}
-          {isSmallBlind && <span className="text-[10px] bg-blue-500 text-white rounded-full px-1 font-bold">SB</span>}
-          {isBigBlind && <span className="text-[10px] bg-purple-500 text-white rounded-full px-1 font-bold">BB</span>}
+          {isDealer && <span className="text-[9px] text-zinc-600 font-mono">D</span>}
+          {isSmallBlind && <span className="text-[9px] text-zinc-600 font-mono">SB</span>}
+          {isBigBlind && <span className="text-[9px] text-zinc-600 font-mono">BB</span>}
         </div>
-        <div className="text-sm font-mono text-yellow-400">{player.chips.toLocaleString()}</div>
-        {allIn && <div className="text-[10px] text-orange-400 font-bold">ALL IN</div>}
+        <span className="text-[11px] font-mono text-zinc-500">{player.chips.toLocaleString()}</span>
+        {allIn && <span className="text-[9px] text-zinc-600">all in</span>}
         {handState?.bet && handState.bet > 0 && (
-          <div className="text-[10px] text-zinc-400">bet: {handState.bet}</div>
+          <span className="text-[9px] font-mono text-zinc-700">{handState.bet}</span>
         )}
       </div>
     </div>

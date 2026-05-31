@@ -6,9 +6,14 @@
   --chip-gold: #d4a017;
 }
 
+@theme {
+  --font-family-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono: var(--font-mono), ui-monospace, monospace;
+}
+
 body {
   background: var(--felt-dark);
   color: #f0f0f0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-family-sans);
   min-height: 100vh;
 }

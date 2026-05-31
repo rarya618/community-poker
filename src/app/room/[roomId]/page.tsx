@@ -90,25 +90,13 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const variantLabel = room.variant === "holdem" ? "Texas Hold'em" : "Omaha";
 
   return (
-    <div className="flex flex-col min-h-screen bg-neutral-950">
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-        <div className="flex items-center gap-4">
-          <span className="font-mono text-white text-sm">{roomId}</span>
-          <span className="text-[10px] text-zinc-600">{variantLabel}</span>
-        </div>
-        <div className="flex items-center gap-4">
-          {error && <span className="text-xs text-red-400/80">{error}</span>}
-          <button
-            onClick={leaveRoom}
-            className="text-[10px] text-zinc-600 hover:text-zinc-300 transition-colors"
-          >
-            Leave
-          </button>
-        </div>
-      </header>
-
+    <div className="flex flex-col h-screen bg-neutral-950">
       {room.status === "waiting" ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-12 p-8">
+          <div className="absolute top-0 right-0 flex items-center gap-4 px-6 py-4">
+            {error && <span className="text-xs text-red-400/80">{error}</span>}
+            <button onClick={leaveRoom} className="text-[10px] text-zinc-600 hover:text-zinc-300 transition-colors">Leave</button>
+          </div>
           <div className="flex flex-col items-center gap-3">
             <span className="text-[10px] text-zinc-700">Room Code</span>
             <span className="text-6xl font-mono font-thin text-white tracking-[0.25em]">{roomId}</span>
@@ -155,7 +143,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
           </button>
         </div>
       ) : room.game ? (
-        <div className="flex-1">
+        <div className="flex-1 min-h-0">
           <Table
             room={room}
             game={room.game}
@@ -163,7 +151,9 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
             holeCards={holeCards}
             onAction={handleAction}
             onNextHand={handleNextHand}
+            onLeave={leaveRoom}
             actionLoading={actionLoading}
+            error={error}
           />
         </div>
       ) : null}

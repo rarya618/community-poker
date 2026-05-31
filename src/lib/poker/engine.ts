@@ -1,12 +1,13 @@
 import { Card, freshDeck, shuffle } from "./deck";
 import { evaluateBest, evaluateOmaha } from "./evaluator";
-import { GameState, GameVariant, Player, PlayerAction, PlayerHandState, Pot, Street } from "./types";
+import { ActionLogEntry, GameState, GameVariant, Player, PlayerAction, PlayerHandState, Pot, Street } from "./types";
 
 const HOLE_CARDS: Record<GameVariant, number> = { holdem: 2, omaha: 4 };
 
 export interface DealResult {
   gameState: GameState;
   holeCards: Record<string, Card[]>;
+  deck: Card[];
 }
 
 export function dealNewHand(
@@ -64,9 +65,14 @@ export function dealNewHand(
     smallBlindUid: sbPlayer.uid,
     bigBlindUid: bbPlayer.uid,
     playerStates,
+    actionLog: [
+      { kind: "street", street: "preflop" },
+      { kind: "blind", uid: sbPlayer.uid, type: "small", amount: sbBet },
+      { kind: "blind", uid: bbPlayer.uid, type: "big", amount: bbBet },
+    ],
   };
 
-  return { gameState, holeCards };
+  return { gameState, holeCards, deck };
 }
 
 export function applyAction(
@@ -79,10 +85,12 @@ export function applyAction(
   if (state.activeUid !== uid) throw new Error("Not your turn");
   const ps = { ...state.playerStates[uid] };
   const player = players.find(p => p.uid === uid)!;
+  const logEntry: ActionLogEntry = { kind: "action", uid, action, ...(raiseAmount !== undefined ? { amount: raiseAmount } : {}) };
   const newState: GameState = {
     ...state,
     playerStates: { ...state.playerStates, [uid]: ps },
     lastAction: { uid, action, ...(raiseAmount !== undefined ? { amount: raiseAmount } : {}) },
+    actionLog: [...(state.actionLog ?? []), logEntry],
   };
 
   const callAmount = state.currentBet - ps.bet;
@@ -182,6 +190,7 @@ function advanceStreet(state: GameState, players: Player[]): GameState {
     playerStates: Object.fromEntries(
       Object.entries(state.playerStates).map(([uid, ps]) => [uid, { ...ps, bet: 0, acted: false }])
     ),
+    actionLog: [...(state.actionLog ?? []), { kind: "street", street: next }],
   };
 
   if (next === "showdown") {

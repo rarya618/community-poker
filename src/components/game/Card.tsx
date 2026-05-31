@@ -32,11 +32,11 @@ export function PlayingCard({ card, faceDown, size = "md", className }: CardProp
     <div className={cn(base, "bg-white border border-zinc-100", className)}>
       <div className={cn("leading-none", color)}>
         <div>{rankDisplay}</div>
-        <div className="text-[0.7em]">{suitSymbol}</div>
+        <div className="text-[1.2em]">{suitSymbol}</div>
       </div>
       <div className={cn("self-end rotate-180 leading-none", color)}>
         <div>{rankDisplay}</div>
-        <div className="text-[0.7em]">{suitSymbol}</div>
+        <div className="text-[1.2em]">{suitSymbol}</div>
       </div>
     </div>
   );

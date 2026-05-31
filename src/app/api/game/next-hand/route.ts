@@ -29,13 +29,14 @@ export async function POST(req: NextRequest) {
     const dealerIdx = sortedSeats.indexOf(currentDealerSeat);
     const nextDealerSeat = sortedSeats[(dealerIdx + 1) % sortedSeats.length];
 
-    const { gameState, holeCards } = dealNewHand(players, room.variant, nextDealerSeat, room.minBet);
+    const { gameState, holeCards, deck } = dealNewHand(players, room.variant, nextDealerSeat, room.minBet);
 
     // Clear old private data first, then write new hole cards in a separate update
     await db.ref(`private/${roomId}`).remove();
 
     const updates: Record<string, unknown> = {};
     updates[`rooms/${roomId}/game`] = gameState;
+    updates[`private/${roomId}/deck`] = deck;
     for (const [playerUid, cards] of Object.entries(holeCards)) {
       updates[`private/${roomId}/${playerUid}/holeCards`] = cards;
     }

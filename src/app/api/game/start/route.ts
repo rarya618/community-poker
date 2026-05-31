@@ -22,13 +22,13 @@ export async function POST(req: NextRequest) {
     if (players.length < 2) return NextResponse.json({ error: "Need at least 2 players" }, { status: 400 });
 
     const dealerSeat = players[0].seatIndex;
-    const { gameState, holeCards } = dealNewHand(players, room.variant, dealerSeat, room.minBet);
+    const { gameState, holeCards, deck } = dealNewHand(players, room.variant, dealerSeat, room.minBet);
 
     const updates: Record<string, unknown> = {};
     updates[`rooms/${roomId}/status`] = "playing";
     updates[`rooms/${roomId}/game`] = gameState;
+    updates[`private/${roomId}/deck`] = deck;
 
-    // Store each player's hole cards at a private path, readable only by that player
     for (const [playerUid, cards] of Object.entries(holeCards)) {
       updates[`private/${roomId}/${playerUid}/holeCards`] = cards;
     }

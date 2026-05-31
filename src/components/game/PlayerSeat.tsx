@@ -37,6 +37,10 @@ export function PlayerSeat({
         !folded && player.isConnected === false && "opacity-35",
       )}
     >
+      {handState?.bet && handState.bet > 0 && (
+        <span className="text-sm font-mono text-zinc-300 mb-1">{handState.bet.toLocaleString()}</span>
+      )}
+
       <div className="flex gap-0.5">
         {Array.from({ length: holeCardCount }).map((_, i) => (
           isCurrentUser && holeCards?.[i]
@@ -45,8 +49,8 @@ export function PlayerSeat({
         ))}
       </div>
 
-      <div className="flex flex-col items-center gap-0.5 mt-0.5">
-        <div className="flex items-center gap-1">
+      <div className="flex flex-col items-center gap-0.5 mt-2">
+        <div className="flex items-center gap-1.5">
           {isActive && <span className="w-1 h-1 rounded-full bg-white shrink-0" />}
           <span className={cn(
             "text-xs truncate max-w-[80px] tracking-wide",
@@ -55,15 +59,12 @@ export function PlayerSeat({
           )}>
             {player.name}
           </span>
+          <span className="text-[11px] font-mono text-zinc-500">{player.chips.toLocaleString()}</span>
           {isDealer && <span className="text-[9px] text-zinc-600 font-mono">D</span>}
           {isSmallBlind && <span className="text-[9px] text-zinc-600 font-mono">SB</span>}
           {isBigBlind && <span className="text-[9px] text-zinc-600 font-mono">BB</span>}
         </div>
-        <span className="text-[11px] font-mono text-zinc-500">{player.chips.toLocaleString()}</span>
         {allIn && <span className="text-[9px] text-zinc-600">all in</span>}
-        {handState?.bet && handState.bet > 0 && (
-          <span className="text-[9px] font-mono text-zinc-700">{handState.bet}</span>
-        )}
       </div>
     </div>
   );

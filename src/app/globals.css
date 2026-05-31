@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  --felt: #1a5c38;
-  --felt-dark: #0d3d25;
   --chip-gold: #d4a017;
 }
 
@@ -12,7 +10,7 @@
 }
 
 body {
-  background: var(--felt-dark);
+  background: #0a0a0a;
   color: #f0f0f0;
   font-family: var(--font-family-sans);
   min-height: 100vh;

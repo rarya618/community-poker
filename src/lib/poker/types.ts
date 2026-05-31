@@ -25,6 +25,11 @@ export interface Pot {
   eligibleUids: string[]; // players who contributed to this pot (for side pots)
 }
 
+export type ActionLogEntry =
+  | { kind: "street"; street: Street }
+  | { kind: "action"; uid: string; action: PlayerAction; amount?: number }
+  | { kind: "blind"; uid: string; type: "small" | "big"; amount: number };
+
 export interface GameState {
   street: Street;
   communityCards: Card[];
@@ -35,6 +40,7 @@ export interface GameState {
   smallBlindUid: string;
   bigBlindUid: string;
   playerStates: Record<string, PlayerHandState>;
+  actionLog: ActionLogEntry[];
   lastAction?: { uid: string; action: PlayerAction; amount?: number };
   winners?: { uid: string; amount: number; handDescription: string }[];
 }

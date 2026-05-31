@@ -14,23 +14,23 @@ interface TableProps {
   holeCards: CardType[];
   onAction: (action: PlayerAction, raiseAmount?: number) => void;
   onNextHand: () => void;
+  onLeave: () => void;
   actionLoading: boolean;
+  error?: string;
 }
 
-// Seat positions around the table (as percentages of the table container)
-const SEAT_POSITIONS = [
-  { top: "80%", left: "50%" },   // 0 - bottom center (hero)
-  { top: "80%", left: "20%" },   // 1 - bottom left
-  { top: "55%", left: "5%" },    // 2 - left
-  { top: "20%", left: "15%" },   // 3 - top left
-  { top: "10%", left: "50%" },   // 4 - top center
-  { top: "20%", left: "85%" },   // 5 - top right
-  { top: "55%", left: "95%" },   // 6 - right
-  { top: "80%", left: "80%" },   // 7 - bottom right
-  { top: "65%", left: "50%" },   // 8 - bottom center alt
-];
+function getSeatPositions(count: number): { top: string; left: string }[] {
+  const cx = 50, cy = 50, rx = 38, ry = 34;
+  return Array.from({ length: count }, (_, i) => {
+    const rad = ((90 + i * (360 / count)) * Math.PI) / 180;
+    return {
+      left: `${cx + rx * Math.cos(rad)}%`,
+      top: `${cy + ry * Math.sin(rad)}%`,
+    };
+  });
+}
 
-export function Table({ room, game, currentUid, holeCards, onAction, onNextHand, actionLoading }: TableProps) {
+export function Table({ room, game, currentUid, holeCards, onAction, onNextHand, onLeave, actionLoading, error }: TableProps) {
   const sortedPlayers = Object.values(room.players).sort((a, b) => a.seatIndex - b.seatIndex);
   const heroIdx = sortedPlayers.findIndex(p => p.uid === currentUid);
   // Rotate so the current player is always first (bottom-center seat)
@@ -50,22 +50,21 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
   const isShowdown = game.street === "showdown";
 
   return (
-    <div className="flex flex-col h-full bg-neutral-950">
-      <div className="relative flex-1 min-h-[420px]">
-        <div className="absolute inset-8 rounded-[50%] bg-neutral-900/40 border border-white/[0.04]" />
-
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
-          <div className="flex gap-1.5">
+    <div className="flex h-full bg-neutral-950">
+      {/* Table area */}
+      <div className="relative flex-1">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3">
+          <div className="flex gap-2">
             {communityCards.map((card, i) => (
               <PlayingCard key={i} card={card} size="md" />
             ))}
             {Array.from({ length: 5 - communityCards.length }).map((_, i) => (
-              <div key={i} className="w-14 h-20 rounded opacity-[0.06] bg-white/10" />
+              <div key={i} className="w-16 h-24 rounded opacity-[0.06] bg-white/10" />
             ))}
           </div>
           {totalPot > 0 && (
             <div className="flex flex-col items-center gap-0.5 mt-1">
-              <span className="text-sm font-mono text-white">{totalPot.toLocaleString()}</span>
+              <span className="text-xl font-mono text-white">{totalPot.toLocaleString()}</span>
               {hasMultiplePots && contestedPots.map((p, i) => (
                 <span key={i} className="text-[10px] font-mono text-zinc-700">
                   {i === 0 ? "main" : `side ${i}`} {p.amount.toLocaleString()}
@@ -77,7 +76,7 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
         </div>
 
         {players.map((player, idx) => {
-          const pos = SEAT_POSITIONS[idx] ?? { top: "50%", left: "50%" };
+          const pos = getSeatPositions(players.length)[idx];
           return (
             <div
               key={player.uid}
@@ -100,46 +99,104 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
         })}
       </div>
 
-      <div className="sticky bottom-0 border-t border-white/[0.06] bg-neutral-950 px-6 py-5 min-h-[110px] flex items-center justify-center">
-        {isShowdown ? (
-          <div className="flex flex-col items-center gap-3 text-center">
-            {game.winners?.map(w => (
-              <div key={w.uid} className="text-sm text-white">
-                <span className="font-medium">{room.players[w.uid]?.name ?? w.uid}</span>
-                <span className="font-mono text-zinc-400 ml-2">+{w.amount.toLocaleString()}</span>
-                {w.handDescription !== "Last player standing" && (
-                  <span className="text-zinc-600 text-xs ml-2">— {w.handDescription}</span>
-                )}
-              </div>
-            ))}
-            {room.hostUid === currentUid && (
-              <button
-                onClick={onNextHand}
-                disabled={actionLoading}
-                className="mt-1 text-xs text-zinc-400 hover:text-white border-b border-zinc-700 hover:border-zinc-400 pb-px transition-colors disabled:opacity-30"
-              >
-                {actionLoading ? "Starting…" : "Next Hand"}
-              </button>
-            )}
-            {room.hostUid !== currentUid && (
-              <p className="text-xs text-zinc-700">Waiting for host…</p>
-            )}
+      {/* Right pane */}
+      <div className="w-72 border-l border-white/10 bg-neutral-900 flex flex-col shrink-0">
+        {/* Room info */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06] shrink-0">
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-white text-sm">{room.id}</span>
+            <span className="text-[10px] text-zinc-600">{room.variant === "holdem" ? "Texas Hold'em" : "Omaha"}</span>
           </div>
-        ) : isMyTurn && currentPlayer ? (
-          <ActionPanel
-            game={game}
-            currentPlayer={currentPlayer}
-            minBet={room.minBet}
-            onAction={onAction}
-            loading={actionLoading}
-          />
-        ) : (
-          <p className="text-xs text-zinc-700">
-            {game.playerStates[currentUid]?.folded
-              ? "You folded"
-              : `Waiting for ${room.players[game.activeUid]?.name ?? "other player"}…`}
-          </p>
-        )}
+          <div className="flex items-center gap-3">
+            {error && <span className="text-xs text-red-400/80">{error}</span>}
+            <button onClick={onLeave} className="text-[10px] text-zinc-600 hover:text-zinc-300 transition-colors">Leave</button>
+          </div>
+        </div>
+
+        {/* Action log */}
+        <div className="flex-1 overflow-y-auto flex flex-col-reverse px-4 py-3 gap-1 min-h-0">
+          {[...(game.actionLog ?? [])].reverse().map((entry, i) => {
+            if (entry.kind === "street") {
+              return (
+                <div key={i} className="flex items-center gap-2 py-1.5">
+                  <div className="flex-1 h-px bg-white/[0.06]" />
+                  <span className="text-[10px] text-zinc-600">{entry.street}</span>
+                  <div className="flex-1 h-px bg-white/[0.06]" />
+                </div>
+              );
+            }
+            if (entry.kind === "blind") {
+              return (
+                <div key={i} className="flex items-baseline justify-between">
+                  <span className="text-xs text-zinc-500">{room.players[entry.uid]?.name ?? entry.uid}</span>
+                  <span className="text-xs text-zinc-600 font-mono">{entry.type === "small" ? "SB" : "BB"} {entry.amount.toLocaleString()}</span>
+                </div>
+              );
+            }
+            const name = room.players[entry.uid]?.name ?? entry.uid;
+            const label = entry.action === "raise" && entry.amount
+              ? `raise ${entry.amount.toLocaleString()}`
+              : entry.action === "call"
+              ? `call`
+              : entry.action;
+            return (
+              <div key={i} className="flex items-baseline justify-between">
+                <span className="text-xs text-zinc-400">{name}</span>
+                <span className={cn(
+                  "text-xs font-mono",
+                  entry.action === "fold" ? "text-red-500/60" :
+                  entry.action === "raise" ? "text-blue-400/70" :
+                  entry.action === "all-in" ? "text-amber-400/70" :
+                  "text-zinc-500"
+                )}>{label}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Controls */}
+        <div className="border-t border-white/[0.06] px-5 py-5 flex flex-col justify-center">
+          {isShowdown ? (
+            <div className="flex flex-col gap-3">
+              {game.winners?.map(w => (
+                <div key={w.uid} className="flex flex-col gap-0.5">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-sm font-medium text-white">{room.players[w.uid]?.name ?? w.uid}</span>
+                    <span className="font-mono text-sm text-zinc-300">+{w.amount.toLocaleString()}</span>
+                  </div>
+                  {w.handDescription !== "Last player standing" && (
+                    <span className="text-xs text-zinc-600">{w.handDescription}</span>
+                  )}
+                </div>
+              ))}
+              {room.hostUid === currentUid ? (
+                <button
+                  onClick={onNextHand}
+                  disabled={actionLoading}
+                  className="mt-2 w-full py-2.5 text-sm font-medium rounded border border-white/10 text-zinc-300 hover:border-white/25 hover:text-white disabled:opacity-30 transition-colors"
+                >
+                  {actionLoading ? "Starting…" : "Next Hand"}
+                </button>
+              ) : (
+                <p className="text-xs text-zinc-700">Waiting for host…</p>
+              )}
+            </div>
+          ) : isMyTurn && currentPlayer ? (
+            <ActionPanel
+              game={game}
+              currentPlayer={currentPlayer}
+              minBet={room.minBet}
+              onAction={onAction}
+              loading={actionLoading}
+            />
+          ) : (
+            <p className="text-sm text-zinc-500">
+              {game.playerStates[currentUid]?.folded
+                ? "You folded"
+                : `It's ${room.players[game.activeUid]?.name ?? "someone"}'s turn to act`}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -14,8 +14,8 @@ export default function Home() {
   }, [user, loading, router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+    <div className="flex items-center justify-center h-screen bg-neutral-950">
+      <div className="w-5 h-5 border border-white/20 border-t-white/60 rounded-full animate-spin" />
     </div>
   );
 }

@@ -19,24 +19,35 @@ interface TableProps {
   error?: string;
 }
 
+// Fixed 8-seat 3-2-3 layout. Index 0 = hero (bottom center), clockwise.
+const SEAT_POSITIONS: { top: string; left: string }[] = [
+  { left: "50%",  top: "88%" },  // 0: bottom center
+  { left: "74%",  top: "80%" },  // 1: bottom right
+  { left: "93%",  top: "55%" },  // 2: right
+  { left: "76%",  top: "18%" },  // 3: top right
+  { left: "50%",  top: "10%" },  // 4: top center
+  { left: "24%",  top: "18%" },  // 5: top left
+  { left: "7%",   top: "55%" },  // 6: left
+  { left: "26%",  top: "80%" },  // 7: bottom left
+];
+
 function getSeatPositions(count: number): { top: string; left: string }[] {
-  const cx = 50, cy = 50, rx = 38, ry = 34;
   return Array.from({ length: count }, (_, i) => {
-    const rad = ((90 + i * (360 / count)) * Math.PI) / 180;
-    return {
-      left: `${cx + rx * Math.cos(rad)}%`,
-      top: `${cy + ry * Math.sin(rad)}%`,
-    };
+    const seatIdx = Math.round((i * 8) / count) % 8;
+    return SEAT_POSITIONS[seatIdx];
   });
 }
 
 export function Table({ room, game, currentUid, holeCards, onAction, onNextHand, onLeave, actionLoading, error }: TableProps) {
-  const sortedPlayers = Object.values(room.players).sort((a, b) => a.seatIndex - b.seatIndex);
+  const sortedPlayers = Object.values(room.players)
+    .filter(p => !!game.playerStates[p.uid])
+    .sort((a, b) => a.seatIndex - b.seatIndex);
   const heroIdx = sortedPlayers.findIndex(p => p.uid === currentUid);
   // Rotate so the current player is always first (bottom-center seat)
   const players = heroIdx <= 0
     ? sortedPlayers
     : [...sortedPlayers.slice(heroIdx), ...sortedPlayers.slice(0, heroIdx)];
+  const isSpectating = !game.playerStates[currentUid];
   const communityCards = game.communityCards ?? [];
   // Derive the displayed pot from side pot calculation so it excludes uncalled bets
   const { pots: effectivePots } = calculateSidePots(game.playerStates ?? {}, players);
@@ -139,6 +150,8 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
             const name = room.players[entry.uid]?.name ?? entry.uid;
             const label = entry.action === "raise" && entry.amount
               ? `raise ${entry.amount.toLocaleString()}`
+              : entry.action === "all-in" && entry.amount
+              ? `all-in ${entry.amount.toLocaleString()}`
               : entry.action === "call"
               ? `call`
               : entry.action;
@@ -184,6 +197,8 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
                 <p className="text-xs text-zinc-700">Waiting for host…</p>
               )}
             </div>
+          ) : isSpectating ? (
+            <p className="text-sm text-zinc-500">Waiting for next hand…</p>
           ) : isMyTurn && currentPlayer ? (
             <ActionPanel
               game={game}

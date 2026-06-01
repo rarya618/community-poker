@@ -71,8 +71,8 @@ export async function GET(req: NextRequest) {
     if (!snap.exists()) return NextResponse.json({ error: "Room not found" }, { status: 404 });
 
     const room = snap.val() as Room;
-    if (room.status !== "waiting") {
-      return NextResponse.json({ error: "Game already started" }, { status: 400 });
+    if (room.status === "finished") {
+      return NextResponse.json({ error: "Game is finished" }, { status: 400 });
     }
 
     const playerCount = Object.keys(room.players ?? {}).length;

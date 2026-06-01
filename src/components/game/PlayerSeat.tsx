@@ -49,7 +49,6 @@ export function PlayerSeat({
       <span className={cn(
         "text-sm truncate max-w-[100px] tracking-wide",
         isCurrentUser ? "text-zinc-400 font-medium" : "text-zinc-500 font-normal",
-        player.isConnected === false && "text-zinc-600",
       )}>
         {player.name}
       </span>
@@ -75,7 +74,6 @@ export function PlayerSeat({
       className={cn(
         "flex flex-col items-center gap-3",
         folded && "opacity-20",
-        !folded && player.isConnected === false && "opacity-35",
       )}
     >
       {betOnTop ? (

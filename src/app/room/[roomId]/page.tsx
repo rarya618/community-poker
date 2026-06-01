@@ -1,8 +1,6 @@
 "use client";
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ref, set } from "firebase/database";
-import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { useRoom, useHoleCards } from "@/hooks/useRoom";
 import { apiCall } from "@/hooks/useApiCall";
@@ -16,8 +14,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const router = useRouter();
 
   async function leaveRoom() {
-    const uid = user?.uid;
-    if (uid) await set(ref(db, `rooms/${roomId}/players/${uid}/isConnected`), false);
+    await apiCall("/api/room/leave", "POST", { roomId });
     router.replace("/lobby");
   }
   const { room, loading } = useRoom(roomId);

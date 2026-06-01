@@ -85,11 +85,12 @@ export function applyAction(
   if (state.activeUid !== uid) throw new Error("Not your turn");
   const ps = { ...state.playerStates[uid] };
   const player = players.find(p => p.uid === uid)!;
-  const logEntry: ActionLogEntry = { kind: "action", uid, action, ...(raiseAmount !== undefined ? { amount: raiseAmount } : {}) };
+  const logAmount = action === "all-in" ? player.chips - ps.totalBet : raiseAmount;
+  const logEntry: ActionLogEntry = { kind: "action", uid, action, ...(logAmount !== undefined ? { amount: logAmount } : {}) };
   const newState: GameState = {
     ...state,
     playerStates: { ...state.playerStates, [uid]: ps },
-    lastAction: { uid, action, ...(raiseAmount !== undefined ? { amount: raiseAmount } : {}) },
+    lastAction: { uid, action, ...(logAmount !== undefined ? { amount: logAmount } : {}) },
     actionLog: [...(state.actionLog ?? []), logEntry],
   };
 

@@ -15,6 +15,7 @@ interface PlayerSeatProps {
   holeCardCount: number;
   betOnTop: boolean;
   playerCount: number;
+  isWinner?: boolean;
 }
 
 export function PlayerSeat({
@@ -29,6 +30,7 @@ export function PlayerSeat({
   holeCardCount,
   betOnTop,
   playerCount,
+  isWinner,
 }: PlayerSeatProps) {
   const folded = handState?.folded ?? false;
   const allIn = handState?.allIn ?? false;
@@ -47,15 +49,21 @@ export function PlayerSeat({
   );
 
   const card = (
-    <div className="flex items-center gap-3 bg-neutral-900 border border-white/[0.06] rounded-full px-4 py-1.5">
-      {isActive && <span className="w-2 h-2 rounded-full bg-white shrink-0" />}
+    <div
+      className={`flex items-center gap-3 rounded-full px-4 py-1.5 border${isWinner ? " winner-glow" : ""}`}
+      style={isWinner
+        ? { background: "rgba(212,160,23,0.12)", borderColor: "rgba(212,160,23,0.5)" }
+        : { background: "rgb(23 23 23)", borderColor: "rgba(255,255,255,0.06)" }
+      }
+    >
+      {isActive && <span className="w-2 h-2 rounded-full bg-white shrink-0 active-dot" />}
       <span className={cn(
         "text-sm truncate max-w-[100px] tracking-wide",
-        isCurrentUser ? "text-zinc-400 font-medium" : "text-zinc-500 font-normal",
-      )}>
+        isWinner ? "font-medium" : isCurrentUser ? "text-zinc-400 font-medium" : "text-zinc-500 font-normal",
+      )} style={isWinner ? { color: "rgba(212,160,23,0.9)" } : undefined}>
         {player.name}
       </span>
-      <span className="text-sm font-mono font-bold text-zinc-300">{player.chips.toLocaleString()}</span>
+      <span className="text-sm font-mono font-bold" style={{ color: isWinner ? "rgba(212,160,23,0.75)" : "rgb(212 212 216)" }}>{player.chips.toLocaleString()}</span>
       {allIn && <span className="text-[9px] text-zinc-600">all in</span>}
     </div>
   );

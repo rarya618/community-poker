@@ -79,7 +79,7 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
     <div className="relative h-full bg-neutral-950">
       {/* Table area */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6">
           <div className="flex gap-2">
             {communityCards.map((card, i) => (
               <PlayingCard key={i} card={card} size="md" />
@@ -88,17 +88,19 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
               <div key={i} className="w-16 h-24 rounded opacity-[0.06] bg-white/10" />
             ))}
           </div>
-          {totalPot > 0 && (
-            <div className="flex flex-col items-center gap-0.5 mt-1">
-              <span className="text-xl font-mono text-white">{totalPot.toLocaleString()}</span>
-              {hasMultiplePots && contestedPots.map((p, i) => (
-                <span key={i} className="text-[10px] font-mono text-zinc-700">
-                  {i === 0 ? "main" : `side ${i}`} {p.amount.toLocaleString()}
-                </span>
-              ))}
-            </div>
-          )}
-          <span className="text-xs text-zinc-500 mt-0.5">{game.street}</span>
+          <div className="flex flex-col items-center gap-1">
+            {totalPot > 0 && (
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-xl font-mono text-white">{totalPot.toLocaleString()}</span>
+                {hasMultiplePots && contestedPots.map((p, i) => (
+                  <span key={i} className="text-[10px] font-mono text-zinc-700">
+                    {i === 0 ? "main" : `side ${i}`} {p.amount.toLocaleString()}
+                  </span>
+                ))}
+              </div>
+            )}
+            <span className="text-xs text-zinc-500">{game.street}</span>
+          </div>
         </div>
 
         {players.map((player, idx) => {
@@ -115,7 +117,7 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
                 player={player}
                 handState={game.playerStates[player.uid]}
                 holeCards={player.uid === currentUid ? holeCards : undefined}
-                isActive={game.activeUid === player.uid}
+                isActive={game.activeUid === player.uid && !game.winners?.length}
                 isDealer={player.seatIndex === game.dealerSeat}
                 isSmallBlind={player.uid === game.smallBlindUid}
                 isBigBlind={player.uid === game.bigBlindUid}
@@ -123,6 +125,7 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
                 holeCardCount={holeCardCount}
                 betOnTop={betOnTop}
                 playerCount={players.length}
+                isWinner={game.winners?.some(w => w.uid === player.uid)}
               />
             </div>
           );
@@ -207,13 +210,13 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
           {isShowdown ? (
             <div className="flex flex-col gap-3">
               {game.winners?.map(w => (
-                <div key={w.uid} className="flex flex-col gap-0.5">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-sm font-medium text-white">{room.players[w.uid]?.name ?? w.uid}</span>
-                    <span className="font-mono text-sm text-zinc-300">+{w.amount.toLocaleString()}</span>
+                <div key={w.uid} className="flex flex-col gap-0.5 rounded-lg px-4 py-3 border border-white/[0.08]" style={{ background: "rgba(212,160,23,0.07)" }}>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-base font-semibold text-white truncate">{room.players[w.uid]?.name ?? w.uid}</span>
+                    <span className="font-mono text-base font-bold shrink-0" style={{ color: "var(--chip-gold)" }}>+{w.amount.toLocaleString()}</span>
                   </div>
                   {w.handDescription !== "Last player standing" && (
-                    <span className="text-xs text-zinc-600">{w.handDescription}</span>
+                    <span className="text-sm text-zinc-400">{w.handDescription}</span>
                   )}
                 </div>
               ))}

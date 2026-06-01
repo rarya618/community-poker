@@ -70,10 +70,10 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   if (!room) {
     return (
       <div className="flex min-h-screen items-center justify-center flex-col gap-6 bg-neutral-950">
-        <p className="text-xs text-zinc-600">Room not found</p>
+        <p className="text-2xl font-mono text-white">Room not found</p>
         <button
           onClick={() => router.replace("/lobby")}
-          className="text-xs text-zinc-500 hover:text-white border-b border-zinc-700 hover:border-zinc-400 pb-px transition-colors"
+          className="px-4 py-2 text-sm font-medium rounded border border-white/10 text-zinc-300 hover:border-white/25 hover:text-white transition-colors"
         >
           Back to Lobby
         </button>
@@ -131,10 +131,10 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         </div>
       ) : room.status === "finished" ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-6 bg-neutral-950">
-          <p className="text-xs text-zinc-600">Game Over</p>
+          <p className="text-2xl font-mono text-white">Game Over</p>
           <button
             onClick={() => router.replace("/lobby")}
-            className="text-xs text-zinc-500 hover:text-white border-b border-zinc-700 hover:border-zinc-400 pb-px transition-colors"
+            className="px-4 py-2 text-sm font-medium rounded border border-white/10 text-zinc-300 hover:border-white/25 hover:text-white transition-colors"
           >
             Back to Lobby
           </button>

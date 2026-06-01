@@ -15,3 +15,21 @@ body {
   font-family: var(--font-family-sans);
   min-height: 100vh;
 }
+
+@keyframes gold-pulse {
+  0%, 100% { box-shadow: 0 0 6px 1px rgba(212,160,23,0.12); }
+  50%       { box-shadow: 0 0 12px 2px rgba(212,160,23,0.28); }
+}
+
+.winner-glow {
+  animation: gold-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+.active-dot {
+  animation: dot-pulse 1.2s ease-in-out infinite;
+}

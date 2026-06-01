@@ -13,6 +13,7 @@ interface PlayerSeatProps {
   isBigBlind: boolean;
   isCurrentUser: boolean;
   holeCardCount: number;
+  betOnTop: boolean;
 }
 
 export function PlayerSeat({
@@ -25,47 +26,73 @@ export function PlayerSeat({
   isBigBlind,
   isCurrentUser,
   holeCardCount,
+  betOnTop,
 }: PlayerSeatProps) {
   const folded = handState?.folded ?? false;
   const allIn = handState?.allIn ?? false;
 
+  const bet = handState?.bet && handState.bet > 0 && (
+    <span className="text-base font-mono text-zinc-300">{handState.bet.toLocaleString()}</span>
+  );
+
+  const badges = (isDealer || isSmallBlind || isBigBlind) && (
+    <div className="flex items-center gap-1.5">
+      {isDealer && <span className="text-xs text-zinc-500 font-mono">D</span>}
+      {isSmallBlind && <span className="text-xs text-zinc-500 font-mono">SB</span>}
+      {isBigBlind && <span className="text-xs text-zinc-500 font-mono">BB</span>}
+    </div>
+  );
+
+  const card = (
+    <div className="flex items-center gap-3 bg-neutral-900 border border-white/[0.06] rounded-full px-4 py-2">
+      {isActive && <span className="w-2 h-2 rounded-full bg-white shrink-0" />}
+      <span className={cn(
+        "text-sm truncate max-w-[100px] tracking-wide",
+        isCurrentUser ? "text-zinc-400 font-medium" : "text-zinc-500 font-normal",
+        player.isConnected === false && "text-zinc-600",
+      )}>
+        {player.name}
+      </span>
+      <span className="text-base font-mono font-bold text-zinc-300">{player.chips.toLocaleString()}</span>
+      {allIn && <span className="text-[9px] text-zinc-600">all in</span>}
+    </div>
+  );
+
+  const nameChips = card;
+
+  const cards = (
+    <div className="flex gap-0.5">
+      {Array.from({ length: holeCardCount }).map((_, i) => (
+        isCurrentUser && holeCards?.[i]
+          ? <PlayingCard key={i} card={holeCards[i]} size="sm" />
+          : <PlayingCard key={i} faceDown size="sm" />
+      ))}
+    </div>
+  );
+
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-1",
+        "flex flex-col items-center gap-3",
         folded && "opacity-20",
         !folded && player.isConnected === false && "opacity-35",
       )}
     >
-      {handState?.bet && handState.bet > 0 && (
-        <span className="text-sm font-mono text-zinc-300 mb-1">{handState.bet.toLocaleString()}</span>
+      {betOnTop ? (
+        <>
+          {bet}
+          {badges}
+          {cards}
+          {nameChips}
+        </>
+      ) : (
+        <>
+          {nameChips}
+          {cards}
+          {badges}
+          {bet}
+        </>
       )}
-
-      <div className="flex gap-0.5">
-        {Array.from({ length: holeCardCount }).map((_, i) => (
-          isCurrentUser && holeCards?.[i]
-            ? <PlayingCard key={i} card={holeCards[i]} size="sm" />
-            : <PlayingCard key={i} faceDown size="sm" />
-        ))}
-      </div>
-
-      <div className="flex flex-col items-center gap-0.5 mt-2">
-        <div className="flex items-center gap-1.5">
-          {isActive && <span className="w-1 h-1 rounded-full bg-white shrink-0" />}
-          <span className={cn(
-            "text-xs truncate max-w-[80px] tracking-wide",
-            isCurrentUser ? "text-white font-medium" : "text-zinc-300 font-normal",
-            player.isConnected === false && "text-zinc-600",
-          )}>
-            {player.name}
-          </span>
-          <span className="text-[11px] font-mono text-zinc-500">{player.chips.toLocaleString()}</span>
-          {isDealer && <span className="text-[9px] text-zinc-600 font-mono">D</span>}
-          {isSmallBlind && <span className="text-[9px] text-zinc-600 font-mono">SB</span>}
-          {isBigBlind && <span className="text-[9px] text-zinc-600 font-mono">BB</span>}
-        </div>
-        {allIn && <span className="text-[9px] text-zinc-600">all in</span>}
-      </div>
     </div>
   );
 }

@@ -72,11 +72,13 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
               ))}
             </div>
           )}
-          <span className="text-[10px] text-zinc-700 mt-0.5">{game.street}</span>
+          <span className="text-xs text-zinc-500 mt-0.5">{game.street}</span>
         </div>
 
         {players.map((player, idx) => {
           const pos = getSeatPositions(players.length)[idx];
+          const topPct = parseFloat(pos.top);
+          const betOnTop = topPct >= 50;
           return (
             <div
               key={player.uid}
@@ -93,6 +95,7 @@ export function Table({ room, game, currentUid, holeCards, onAction, onNextHand,
                 isBigBlind={player.uid === game.bigBlindUid}
                 isCurrentUser={player.uid === currentUid}
                 holeCardCount={holeCardCount}
+                betOnTop={betOnTop}
               />
             </div>
           );

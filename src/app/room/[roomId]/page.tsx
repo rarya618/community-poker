@@ -98,24 +98,24 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
             <button onClick={leaveRoom} className="px-4 py-2 text-sm font-medium rounded border border-white/10 text-zinc-300 hover:border-white/25 hover:text-white transition-colors">Leave</button>
           </div>
           <div className="flex flex-col items-center gap-3">
-            <span className="text-[10px] text-zinc-700">Room Code</span>
+            <span className="text-xs text-zinc-500">Room Code</span>
             <span className="text-6xl font-mono font-thin text-white tracking-[0.25em]">{roomId}</span>
           </div>
 
           <div className="flex flex-col gap-0 w-full max-w-xs">
             <div className="flex items-center justify-between py-2 border-b border-white/[0.06]">
-              <span className="text-[10px] text-zinc-700">Players</span>
-              <span className="text-[10px] font-mono text-zinc-700">{playerCount}/9</span>
+              <span className="text-xs text-zinc-500">Players</span>
+              <span className="text-xs font-mono text-zinc-500">{playerCount}/9</span>
             </div>
             {Object.values(room.players).map(p => (
               <div key={p.uid} className="flex items-center justify-between py-2.5 border-b border-white/[0.04]">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-white">{p.name}</span>
+                  <span className="text-base text-white">{p.name}</span>
                   {p.uid === room.hostUid && (
-                    <span className="text-[9px] text-zinc-700">host</span>
+                    <span className="text-xs text-zinc-500 border border-white/10 rounded-full px-2 py-0.5">host</span>
                   )}
                 </div>
-                <span className="text-xs font-mono text-zinc-600">{room.startingChips.toLocaleString()}</span>
+                <span className="text-sm font-mono text-zinc-600">{room.startingChips.toLocaleString()}</span>
               </div>
             ))}
           </div>

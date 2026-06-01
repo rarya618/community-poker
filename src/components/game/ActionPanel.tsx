@@ -65,13 +65,6 @@ export function ActionPanel({ game, currentPlayer, minBet, onAction, loading }: 
             Call <span className="font-mono">{callAmount.toLocaleString()}</span>
           </button>
         )}
-        <button
-          onClick={() => onAction("all-in")}
-          disabled={loading}
-          className="flex-1 py-2.5 text-sm font-medium rounded bg-amber-900/50 border border-amber-700/50 text-amber-200 hover:bg-amber-900/70 hover:border-amber-600 disabled:opacity-30 transition-colors"
-        >
-          All In
-        </button>
       </div>
 
       <div className="flex flex-col gap-2 w-full">
@@ -117,13 +110,22 @@ export function ActionPanel({ game, currentPlayer, minBet, onAction, loading }: 
             [&::-moz-range-thumb]:bg-blue-400 [&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:cursor-pointer"
         />
 
-        <button
-          onClick={() => { onAction("raise", raiseValue >= minRaise ? raiseValue : minRaise); setRaiseAmount(""); }}
-          disabled={loading || maxRaise < minRaise}
-          className="w-full mt-4 py-2.5 text-sm font-medium rounded bg-blue-900/50 border border-blue-700/50 text-blue-200 hover:bg-blue-900/70 hover:border-blue-600 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-        >
-          Raise <span className="font-mono">{(raiseValue >= minRaise ? raiseValue : minRaise).toLocaleString()}</span>
-        </button>
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={() => { onAction("raise", raiseValue >= minRaise ? raiseValue : minRaise); setRaiseAmount(""); }}
+            disabled={loading || maxRaise < minRaise}
+            className="flex-1 py-2.5 text-sm font-medium rounded bg-blue-900/50 border border-blue-700/50 text-blue-200 hover:bg-blue-900/70 hover:border-blue-600 disabled:opacity-20 disabled:cursor-not-allowed transition-colors min-w-0"
+          >
+            Raise <span className="font-mono">{(raiseValue >= minRaise ? raiseValue : minRaise).toLocaleString()}</span>
+          </button>
+          <button
+            onClick={() => onAction("all-in")}
+            disabled={loading}
+            className="shrink-0 px-4 py-2.5 text-sm font-medium rounded bg-amber-900/50 border border-amber-700/50 text-amber-200 hover:bg-amber-900/70 hover:border-amber-600 disabled:opacity-30 transition-colors"
+          >
+            All In
+          </button>
+        </div>
       </div>
     </div>
   );

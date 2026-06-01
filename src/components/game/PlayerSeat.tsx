@@ -14,6 +14,7 @@ interface PlayerSeatProps {
   isCurrentUser: boolean;
   holeCardCount: number;
   betOnTop: boolean;
+  playerCount: number;
 }
 
 export function PlayerSeat({
@@ -27,9 +28,11 @@ export function PlayerSeat({
   isCurrentUser,
   holeCardCount,
   betOnTop,
+  playerCount,
 }: PlayerSeatProps) {
   const folded = handState?.folded ?? false;
   const allIn = handState?.allIn ?? false;
+  const cardSize = playerCount <= 4 ? "sm" : "xs";
 
   const bet = handState?.bet && handState.bet > 0 && (
     <span className="text-base font-mono text-zinc-300">{handState.bet.toLocaleString()}</span>
@@ -44,7 +47,7 @@ export function PlayerSeat({
   );
 
   const card = (
-    <div className="flex items-center gap-3 bg-neutral-900 border border-white/[0.06] rounded-full px-4 py-2">
+    <div className="flex items-center gap-3 bg-neutral-900 border border-white/[0.06] rounded-full px-4 py-1.5">
       {isActive && <span className="w-2 h-2 rounded-full bg-white shrink-0" />}
       <span className={cn(
         "text-sm truncate max-w-[100px] tracking-wide",
@@ -52,7 +55,7 @@ export function PlayerSeat({
       )}>
         {player.name}
       </span>
-      <span className="text-base font-mono font-bold text-zinc-300">{player.chips.toLocaleString()}</span>
+      <span className="text-sm font-mono font-bold text-zinc-300">{player.chips.toLocaleString()}</span>
       {allIn && <span className="text-[9px] text-zinc-600">all in</span>}
     </div>
   );
@@ -63,8 +66,8 @@ export function PlayerSeat({
     <div className="flex gap-0.5">
       {Array.from({ length: holeCardCount }).map((_, i) => (
         isCurrentUser && holeCards?.[i]
-          ? <PlayingCard key={i} card={holeCards[i]} size="sm" />
-          : <PlayingCard key={i} faceDown size="sm" />
+          ? <PlayingCard key={i} card={holeCards[i]} size={cardSize} />
+          : <PlayingCard key={i} faceDown size={cardSize} />
       ))}
     </div>
   );
